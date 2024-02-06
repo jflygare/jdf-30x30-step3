@@ -1,1 +1,42 @@
-<p>student-detail works!</p>
+<mat-card class="students-detail">
+    <mat-card-header>
+      <mat-card-title>
+        <span *ngIf="stagedStudent.id === -1; else editTitle">
+          Add Student
+        </span>
+        <ng-template #editTitle>
+          Edit {{ stagedStudent.firstName }} {{ stagedStudent.lastName }}
+        </ng-template>
+      </mat-card-title>
+    </mat-card-header>
+    <form #ngForm="ngForm" (ngSubmit)="saveStudent()">
+      <mat-card-content>
+        <div class="student-editor">
+          <mat-form-field floatLabel="always">
+            <mat-label>First Name</mat-label>
+            <input matInput name="firstName" [(ngModel)]="stagedStudent.firstName" required minlength="2" />
+          </mat-form-field>
+          <br>
+          <mat-form-field floatLabel="always">
+            <mat-label>Last Name</mat-label>
+            <input matInput name="lastName" [(ngModel)]="stagedStudent.lastName" required minlength="2" />
+          </mat-form-field>
+          <br>
+          <mat-checkbox name="isActive" [(ngModel)]="stagedStudent.isActive">Is Active</mat-checkbox>
+          <h4>Enrolled Courses</h4>
+          <mat-checkbox *ngFor="let course of courseEnum | keyvalue" [checked]="hasCourse(course.value)"
+            (change)="updateCourses(course.value, $event.checked)">
+            {{ course.value }}
+          </mat-checkbox>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-icon-button type="submit" [disabled]="ngForm.invalid">
+          <mat-icon>done_outline</mat-icon>
+        </button>
+        <button mat-icon-button type="button" (click)="cancelSave()">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>

@@ -1,0 +1,16 @@
+.students-list {
+
+    mat-list-item:hover {
+        cursor: pointer;
+        background: var(--mat-app-background-color);
+    }
+
+    mat-list-item {
+        border-bottom: 1px solid #efefef;
+        display: flex;
+        flex-direction: row;
+        span {
+            padding-left: 10px;
+        }
+    }
+}

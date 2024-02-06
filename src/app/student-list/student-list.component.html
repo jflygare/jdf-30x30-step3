@@ -1,1 +1,23 @@
-<p>student-list works!</p>
+<mat-card class="students-list">
+  <mat-card-header>
+    <mat-card-title> Students </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item
+        *ngFor="let student of students"
+        (click)="selectStudent(student)"
+      >
+        <button mat-icon-button (click)="deleteStudent(student)">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <span matLine>{{ student.firstName }} {{ student.lastName }}</span>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-icon-button (click)="addStudent()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>
