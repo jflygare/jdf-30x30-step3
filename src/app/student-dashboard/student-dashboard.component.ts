@@ -1,48 +1,102 @@
-import { Component, inject } from '@angular/core';
-import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
-import { map } from 'rxjs/operators';
-import { AsyncPipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { StudentListComponent } from "../student-list/student-list.component";
+import { StudentDetailComponent } from "../student-detail/student-detail.component";
+import { Course } from '../course';
+import { Student } from '../student';
 
 @Component({
-  selector: 'app-student-dashboard',
-  templateUrl: './student-dashboard.component.html',
-  styleUrl: './student-dashboard.component.css',
-  standalone: true,
-  imports: [
-    AsyncPipe,
-    MatGridListModule,
-    MatMenuModule,
-    MatIconModule,
-    MatButtonModule,
-    MatCardModule
-  ]
+    selector: 'app-student-dashboard',
+    templateUrl: './student-dashboard.component.html',
+    styleUrl: './student-dashboard.component.css',
+    standalone: true,
+    imports: [
+        MatGridListModule,
+        MatMenuModule,
+        MatIconModule,
+        MatButtonModule,
+        MatCardModule,
+        StudentListComponent,
+        StudentDetailComponent
+    ]
 })
-export class StudentDashboardComponent {
-  private breakpointObserver = inject(BreakpointObserver);
+export class StudentDashboardComponent implements OnInit {
+  students: Student[] = [];
 
-  /** Based on the screen size, switch from standard to one column per row */
-  cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
-    map(({ matches }) => {
-      if (matches) {
-        return [
-          { title: 'Card 1', cols: 1, rows: 1 },
-          { title: 'Card 2', cols: 1, rows: 1 },
-          { title: 'Card 3', cols: 1, rows: 1 },
-          { title: 'Card 4', cols: 1, rows: 1 }
-        ];
+  selectedStudent: Student = this.getStudentById(-1);
+
+  ngOnInit(): void {
+    this.students = [
+      {
+        id: 0,
+        firstName: "Joe",
+        lastName: "Smith",
+        isActive: true,
+        courses: [
+          Course.MachineLearning
+        ]
+      },
+      {
+        id: 1,
+        firstName: "Jane",
+        lastName: "Doe",
+        isActive: false,
+        courses: [
+          Course.IntroToHtml,
+          Course.FunctionalJavaScript
+        ]
       }
+    ];
+  }
 
-      return [
-        { title: 'Card 1', cols: 2, rows: 1 },
-        { title: 'Card 2', cols: 1, rows: 1 },
-        { title: 'Card 3', cols: 1, rows: 2 },
-        { title: 'Card 4', cols: 1, rows: 1 }
-      ];
-    })
-  );
+  selectStudent(student: Student): void {
+    this.selectedStudent = student;
+  }
+
+  newStudent(): void {
+    this.selectedStudent = this.getStudentById(-1);
+  }
+
+  deleteStudent(student: Student): void {
+    this.students.splice(this.students.findIndex((s) => student.id === s.id), 1);
+    if (this.selectedStudent.id === student.id)
+      this.newStudent()
+  }
+
+  saveStudent(student: Student): void {
+    const isNew = student.id === -1;
+    if (isNew)
+      student.id = this.getNextId();
+    else
+      // remove and re-add, as instances may not be equal
+      //this.deleteStudent(student); // prevent unnecessary events
+      this.students.splice(this.students.findIndex((s) => student.id === s.id), 1);
+
+    this.students.push(student);
+    this.selectedStudent = student;
+  }
+
+  private getNextId(): number {
+    if (this.students.length === 0) {
+      return 0;
+    }
+    return this.students.map(s => s.id).reduce((prev, current) => (prev > current) ? prev : current) + 1;
+  }
+
+  private getStudentById(id: number): Student {
+    if (id == -1) {
+      return {
+        id: id,
+        firstName: null!,
+        lastName: null!,
+        isActive: false,
+        courses: []
+      }
+    }
+    return this.students.find((s) => s.id === id)!
+  }
 }
